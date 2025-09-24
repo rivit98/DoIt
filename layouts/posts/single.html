@@ -56,24 +56,19 @@
         {{- /* Meta */ -}}
         <div class="post-meta">
             <div class="post-meta-line">
-                <span class="post-author">
-                    {{- partial "meta/author.html" . }}
-                </span>
-                {{- with .Params.categories | or .Params.series -}}
-                    &nbsp;<span class="post-category">
-                        {{- T "includedIn" | safeHTML -}}
-                    </span>
+                {{- with .Site.Params.dateformat | default "2006-01-02" | .PublishDate.Format -}}
+                    {{ partial "plugin/fontawesome.html" (dict "Style" "regular" "Icon" "calendar-alt") }}&nbsp;<time datetime="{{ . }}">{{ . }}</time>&nbsp;
                 {{- end -}}
                 
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{- partial "plugin/fontawesome.html" (dict "Style" "solid" "Icon" "tags") -}}&nbsp;
                 {{- $categories := slice -}}
                 {{- range .Params.categories -}}
                     {{- $category := partialCached "function/path.html" . . | printf "/categories/%v" | $.Site.GetPage -}}
-                    {{- $icon := partial "plugin/fontawesome.html" (dict "Style" "regular" "Icon" "folder") -}}
-                    {{- $categories = $categories | append (printf `<a href="%v">%v%v</a>` $category.RelPermalink $icon $category.Title) -}}
+                    {{- $categories = $categories | append (printf `<a href="%v">%v</a>` $category.RelPermalink (lower $category.Title)) -}}
                 {{- end -}}
-                {{- with delimit $categories "&nbsp;" -}}
+                {{- with delimit $categories ",&nbsp;" -}}
                     &nbsp;<span class="post-category">
-                        {{- dict "Categories" . "Count" (len $categories) | T "includedInCategories" | safeHTML -}}
+                        {{ . | safeHTML }}
                     </span>
                 {{- end -}}
                 
@@ -96,9 +91,7 @@
                 {{- end -}}
             </div>
             <div class="post-meta-line">
-                {{- with .Site.Params.dateformat | default "2006-01-02" | .PublishDate.Format -}}
-                    {{ partial "plugin/fontawesome.html" (dict "Style" "regular" "Icon" "calendar-alt") }}&nbsp;<time datetime="{{ . }}">{{ . }}</time>&nbsp;
-                {{- end -}}
+
                 {{- if $params.enableLastMod | default true -}}
                     {{- with .Site.Params.dateformat | default "2006-01-02" | .Lastmod.Format -}}
                         {{ partial "plugin/fontawesome.html" (dict "Style" "regular" "Icon" "edit") }}&nbsp;<time datetime="{{ . }}">{{ . }}</time>&nbsp;
@@ -160,6 +153,7 @@
                 {{- end -}}
             </div>
         </div>
+        <br>
 
         {{- /* Featured image */ -}}
         {{- $image := $params.featuredimage -}}
